@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> <!--if we remove title and script line it will become non responsive and without bootstarp-->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+<style>
+        
+        input{
+            width: 300px;
+        }
+       fieldset{
+        width: 30rem;
+        background-color: peru;
+        text-align: center;
+        margin: 0 10rem;
+       }
+        
+    </style>
+</head>
+<body>
+    <form action="a" onsubmit="onsignup(event)">
+        <fieldset>
+            <div class="col-md ">
+                <h1>Booking Appointment</h1>
+            </div>
+        <div>
+        <label> Name:</label><br>
+        <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+        <label>Email:</label><br>
+        <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+        <label>Phone:</label><br>
+        <input type="tel" id="number" name="number" required>
+        </div>
+        <div>
+        <label for="Date">Date</label><br>
+        <input type="date" name="date" >
+        
+        </div>
+        <button >Submit</button>      
+        </fieldset>
+    </form>
+    <div>
+    <ul id="ListofUser"></ul>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <script>
+        async function onsignup(event){
+            event.preventDefault();
+            //console.log("submit");
+            const name= document.getElementById('username').value;
+            const email=document.getElementById('email').value;
+            const phoneNo = document.getElementById('number').value;
+
+            const obj= {
+                name, email, phoneNo
+            }
+            //console.log("html", obj);
+            try{
+            const response= await axios.post('http://localhost:3005/user', obj)
+            console.log("response", response.data);
+            }catch(err){
+                console.log(err);
+            }
+            
+        }
+        window.addEventListener('DOMContentLoaded',async ()=>{
+            //console.log("inside")
+            try{
+                const response=await axios.get('http://localhost:3005/user')
+                console.log("show", response.data);
+                const userList= response.data.users;
+                showAllUser(userList);
+            }catch(err){
+                console.log(err);
+            }
+        }
+        
+        )
+        async function showAllUser(userList){
+           //console.log(userList)
+            const parent= document.getElementById('ListofUser');
+            
+            userList.forEach((user)=> {
+                const childEle=document.createElement("li");
+                childEle.setAttribute('id', user.id);
+                const deleteBtnEle= document.createElement('button');
+                deleteBtnEle.textContent='Delete';
+                childEle.textContent= `Name : ${user.name} - Phone No.: ${user.phoneNo}- Email ID- ${user.email} `
+                deleteBtnEle.addEventListener('click', async()=>{ 
+                    const response= await axios.delete(`http://localhost:3005/user/${user.id}`)
+                });
+                childEle.append(deleteBtnEle);
+                
+                //console.log(user.name);
+                parent.append(childEle);
+
+            });
+            
+        }
+        async function deleteUser(id){
+            console.log("deleteid", id)
+            
+        }
+        
+    </script>
+</body>
+</html>
